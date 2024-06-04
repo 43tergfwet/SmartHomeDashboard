@@ -1,1 +1,3 @@
-SmartHomeDashboard is a dynamic web application designed for managing smart devices in a home environment. It features a user-friendly interface for inputting device settings and personal details, alongside robust functionality for fetching and displaying device data from the backend. The project incorporates advanced frontend logic to facilitate seamless user authentication and ensure a personalized and secure user experience. Ideal for individuals looking to streamline their home automation processes, SmartHomeDashboard represents the ultimate tool in achieving a connected and efficient smart home.
+## SmartHomeDashboard
+
+This project is a smart home dashboard application that allows users to manage and monitor their smart home devices, analyze data, and improve automation using Node.js for the backend, Python for data analysis and machine learning, and HTML/CSS/JavaScript for the frontend.
