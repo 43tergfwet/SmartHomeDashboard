@@ -2,10 +2,12 @@ import axios from 'axios';
 import { Auth } from "./auth";
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
+const REFRESH_INTERVAL = 30000; // Refresh every 30 seconds
 
 class DeviceSettings {
     constructor() {
         this.devices = [];
+        this.refreshInterval = null;
     }
 
     async fetchDevices() {
@@ -32,10 +34,22 @@ class DeviceSettings {
     async updateDeviceStatus(deviceId, newStatus) {
         try {
             await axios.put(`${API_BASE_URL}/devices/${deviceId}`, { status: newStatus });
-            console.log(`Device ${deviceId} status updated to ${newStatus}`);
+            console.log(`Device ${deviceId} status updated to ${new/LStatus}`);
             this.fetchDevices();
         } catch (error) {
             console.error('Error updating device status:', error);
+        }
+    }
+
+    startAutoRefresh() {
+        this.fetchDevices(); // Initial fetch
+        this.refreshInterval = setInterval(() => this.fetchDevices(), REFRESH_INTERVAL);
+    }
+
+    stopAutoRefresh() {
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = null;
         }
     }
 }
@@ -76,7 +90,7 @@ window.onload = () => {
         await user.login(email, password);
     });
 
-    deviceSettings.fetchDevices();
+    deviceSettings.startAutoRefresh();
 
     document.getElementById('updateDeviceForm').addEventListener('submit', async (event) => {
         event.preventDefault();
