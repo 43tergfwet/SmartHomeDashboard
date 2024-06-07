@@ -17,7 +17,13 @@ class DeviceSettings {
             console.log('Devices fetched successfully:', this.devices);
             this.displayDevices();
         } catch (error) {
-            console.error('Error fetching devices:', error);
+            if (error.response) {
+                console.error(`Error fetching devices: ${error.response.status} ${error.response.data}`);
+            } else if (error.request) {
+                console.error('Error fetching devices: No response received');
+            } else {
+                console.error('Error:', error.message);
+            }
         }
     }
 
@@ -33,11 +39,17 @@ class DeviceSettings {
 
     async updateDeviceStatus(deviceId, newStatus) {
         try {
-            await axios.put(`${API_BASE_URL}/devices/${deviceId}`, { status: newStatus });
-            console.log(`Device ${deviceId} status updated to ${new/LStatus}`);
+            const response = await axios.put(`${API_BASE_URL}/devices/${deviceId}`, { status: newStatus });
+            console.log(`Device ${deviceId} status updated to ${newStatus}.`);
             this.fetchDevices();
         } catch (error) {
-            console.error('Error updating device status:', error);
+            if (error.response) {
+                console.error(`Error updating device status: ${error.response.status} ${error.response.data}`);
+            } else if (error.request) {
+                console.error('Error updating device status: No response received');
+            } else {
+                console.error('Error:', error.message);
+            }
         }
     }
 
@@ -64,7 +76,13 @@ class User {
             const response = await this.auth.login(email, password);
             console.log('Login successful:', response);
         } catch (error) {
-            console.error('Login failed:', error);
+            if (error.response) {
+                console.error(`Login failed: ${error.response.status} ${error.response.data}`);
+            } else if (error.request) {
+                console.error('Login failed: No response received');
+            } else {
+                console.error('Error:', error.message);
+            }
         }
     }
 
@@ -73,7 +91,13 @@ class User {
             await axios.put(`${API_BASE_URL}/users/${userId}`, details);
             console.log(`User ${userId} details updated.`);
         } catch (error) {
-            console.error('Error updating user details:', error);
+            if (error.response) {
+                console.error(`Error updating user details: ${error.response.status} ${error.response.data}`);
+            } else if (error.request) {
+                console.error('Error updating user details: No response received');
+            } else {
+                console.error('Error:', error.message);
+            }
         }
     }
 }
