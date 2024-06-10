@@ -17,13 +17,7 @@ class DeviceSettings {
             console.log('Devices fetched successfully:', this.devices);
             this.displayDevices();
         } catch (error) {
-            if (error.response) {
-                console.error(`Error fetching devices: ${error.response.status} ${error.response.data}`);
-            } else if (error.request) {
-                console.error('Error fetching devices: No response received');
-            } else {
-                console.error('Error:', error.message);
-            }
+            this.handleError(error);
         }
     }
 
@@ -32,7 +26,13 @@ class DeviceSettings {
         devicesElement.innerHTML = '';
         this.devices.forEach(device => {
             const deviceElement = document.createElement('div');
-            deviceElement.textContent = `Device: ${device.name}, Status: ${device.status}`;
+            let content = `Device: ${device.name}, Status: ${device.status}`;
+
+            if(device.type === 'thermostat') {
+                content += `, Temperature: ${device.temperature}°C`;
+            }
+
+            deviceElement.textContent = content;
             devicesElement.appendChild(deviceElement);
         });
     }
@@ -43,13 +43,17 @@ class DeviceSettings {
             console.log(`Device ${deviceId} status updated to ${newStatus}.`);
             this.fetchDevices();
         } catch (error) {
-            if (error.response) {
-                console.error(`Error updating device status: ${error.response.status} ${error.response.data}`);
-            } else if (error.request) {
-                console.error('Error updating device status: No response received');
-            } else {
-                console.error('Error:', error.message);
-            }
+            this.handleError(error);
+        }
+    }
+
+    async updateDeviceTemperature(deviceId, temperature) {
+        try {
+            const response = await axios.put(`${API_BASE_URL}/devices/${deviceId}`, { temperature: temperature });
+            console.log(`Device ${deviceId} temperature set to ${temperature}.`);
+            this.fetchDevices();
+        } catch (error) {
+            this.handleError(error);
         }
     }
 
@@ -64,6 +68,16 @@ class DeviceSettings {
             this.refreshInterval = null;
         }
     }
+
+    handleError(error) {
+        if (error.response) {
+            console.error(`Error: ${error.response.status} ${error.response.data}`);
+        } else if (error.request) {
+            console.error('Error: No response received');
+        } else {
+            console.error('Error:', error.message);
+        }
+    }
 }
 
 class User {
@@ -76,13 +90,7 @@ class User {
             const response = await this.auth.login(email, password);
             console.log('Login successful:', response);
         } catch (error) {
-            if (error.response) {
-                console.error(`Login failed: ${error.response.status} ${error.response.data}`);
-            } else if (error.request) {
-                console.error('Login failed: No response received');
-            } else {
-                console.error('Error:', error.message);
-            }
+            this.handleError(error);
         }
     }
 
@@ -91,13 +99,17 @@ class User {
             await axios.put(`${API_BASE_URL}/users/${userId}`, details);
             console.log(`User ${userId} details updated.`);
         } catch (error) {
-            if (error.response) {
-                console.error(`Error updating user details: ${error.response.status} ${error.response.data}`);
-            } else if (error.request) {
-                console.error('Error updating user details: No response received');
-            } else {
-                console.error('Error:', error.message);
-            }
+            this.handleError(error);
+        }
+    }
+
+    handleError(error) {
+        if (error.response) {
+            console.error(`Error: ${error.response.status} ${error.response.data}`);
+        } else if (error.request) {
+                console.error('Error: No response received');
+        } else {
+            console.error('Error:', error.message);
         }
     }
 }
@@ -121,5 +133,12 @@ window.onload = () => {
         const deviceId = event.target.deviceId.value;
         const newStatus = event.target.newStatus.value;
         await deviceSettings.updateDeviceStatus(deviceId, newStatus);
+    });
+
+    document.getElementById('updateTemperatureForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const deviceId = event.target.deviceId.value;
+        const temperature = event.target.temperature.value;
+        await deviceSettings.updateDeviceTemperature(deviceId, temperature);
     });
 };
