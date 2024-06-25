@@ -3,11 +3,11 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const DB_PATH = process.env.DB_PATH || './smartHomeDB.json';
+const DATABASE_FILE_PATH = process.env.DB_PATH || './smartHomeDB.json';
 
-const readDB = () => {
+const readDatabase = () => {
   try {
-    const data = fs.readFileSync(DB_PATH);
+    const data = fs.readFileSync(DATABASE_FILE_PATH, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
     console.error("Error reading database:", error);
@@ -15,39 +15,39 @@ const readDB = () => {
   }
 };
 
-const writeDB = (data) => {
+const writeDatabase = (data) => {
   try {
-    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+    fs.writeFileSync(DATABASE_FILE_PATH, JSON.stringify(data, null, 2), 'utf-8');
   } catch (error) {
-    console.error("Error writing to database:", error);
+   console.error("Error writing to database:", error);
   }
 };
 
-const setTemperature = (temp) => {
-  const db = readDB();
-  db.temperature = temp;
-  writeDB(db);
-  console.log(`Temperature set to ${temp} degrees`);
+const updateTemperatureSetting = (temperature) => {
+  const database = readDatabase();
+  database.temperature = temperature;
+  writeDatabase(database);
+  console.log(`Temperature set to ${temperature} degrees`);
 };
 
-const adjustSchedule = (schedule) => {
-  const db = readDB();
-  db.schedule = schedule;
-  writeDB(db);
-  console.log("Schedule updated:", schedule);
+const updateSchedule = (newSchedule) => {
+  const database = readDatabase();
+  database.schedule = newSchedule;
+  writeDatabase(database);
+  console.log("Schedule updated:", newSchedule);
 };
 
-const monitorEnergyUsage = () => {
-  const db = readDB();
-  if (!db.energyUsage) {
+const logCurrentEnergyUsage = () => {
+  const database = readDatabase();
+  if (!database.energyUsage) {
     console.log("No energy usage data available.");
     return;
   }
-  console.log("Energy Usage:", db.energyUsage);
+  console.log("Energy Usage:", database.energyUsage);
 };
 
 module.exports = {
-  setTemperature,
-  adjustSchedule,
-  monitorEnergyUsage,
+  updateTemperatureSetting,
+  updateSchedule,
+  logCurrentEnergyUsage,
 };
