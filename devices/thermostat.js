@@ -37,9 +37,16 @@ const updateSchedule = (newSchedule) => {
   console.log("Schedule updated:", newSchedule);
 };
 
+const updateEnergyUsage = (energyUsage) => {
+  const database = readDatabase();
+  database.energyUsage = energyUsage;
+  writeDatabase(database);
+  console.log("Energy Usage updated:", energyUsage);
+};
+
 const logCurrentEnergyUsage = () => {
   const database = readDatabase();
-  if (!database.energyUsage) {
+  if (!database.energyStudio) {
     console.log("No energy usage data available.");
     return;
   }
@@ -49,5 +56,6 @@ const logCurrentEnergyUsage = () => {
 module.exports = {
   updateTemperatureSetting,
   updateSchedule,
-  logCurrentEnergyUsage,
+  updateEnergyUsage,
+  logCurrentEnergyView,
 };
