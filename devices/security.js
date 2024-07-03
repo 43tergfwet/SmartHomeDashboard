@@ -4,6 +4,14 @@ require('dotenv').config();
 
 const { EMAIL_USER, EMAIL_PASS, ALERT_EMAIL } = process.env;
 
+const emailTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: EMAIL_USER,
+    pass: EMAIL_PASS
+  }
+});
+
 function armSystem() {
   console.log("Arming the security system...");
 }
@@ -15,20 +23,13 @@ function disarmSystem() {
 function monitorCameras() {
   console.log("Monitoring security cameras...");
   setTimeout(() => {
-    console.log("Intruder detected!");
-    sendAlert("Intruder detected by the security cameras.");
+    const message = "Intruder detected!";
+    console.log(message);
+    sendAlert(message);
   }, 10000); 
 }
 
 function sendAlert(message) {
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASS
-    }
-  });
-
   let mailOptions = {
     from: EMAIL_USER,
     to: ALERT_EMAIL,
@@ -36,7 +37,7 @@ function sendAlert(message) {
     text: message
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
+  emailTransporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log("Error sending email: ", error);
     } else {
