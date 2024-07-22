@@ -17,55 +17,97 @@ class SmartHomeDashboardML:
     def load_data(self, file_path):
         try:
             return pd.read_csv(file_path)
-        except FileNotFoundError:
-            print(f"The file {file_path} was not found.")
+        except FileNotFoundError as e:
+            print(f"Error: {e}. \nThe file {file_path} was not found.")
+            return None
+        except Exception as e:
+            print(f"An unexpected error occurred while loading data: {e}")
             return None
 
     def preprocess_data(self, data):
-        data.fillna(data.mean(), inplace=True)
-        return data
+        try:
+            data.fillna(data.mean(), inplace=True)
+            return data
+        except Exception as e:
+            print(f"An error occurred during preprocessing: {e}")
+            return None
 
     def split_data(self, data, target_name):
-        X = data.drop(columns=[target_name])
-        y = data[target_name]
-        return train_test_split(X, y, test_size=0.2, random_state=42)
+        try:
+            X = data.drop(columns=[target_name])
+            y = data[target_name]
+            return train_test_split(X, y, test_size=0.2, random_state=42)
+        except KeyError:
+            print(f"Error: The specified target name {target_name} does not exist in data.")
+            return None, None, None, None
+        except Exception as e:
+            print(f"An unexpected error occurred while splitting data: {e}")
+            return None, None, None, None
 
     def train_model(self, X_train, y_train):
-        self.model = RandomForestClassifier(n_estimators=100)
-        self.model.fit(X_train, y_train)
-        return self.model
+        try:
+            self.model = RandomForestClassifier(n_estimators=100)
+            self.model.fit(X_train, y_train)
+            return self.model
+        except Exception as e:
+            print(f"An error occurred during model training: {e}")
+            return None
 
     def feature_importance(self):
-        feature_importances = pd.Series(self.model.feature_importances_).sort_values(ascending=False)
-        plt.figure(figsize=(12,8))
-        feature_importances.plot(kind='bar', title='Feature Importance')
-        plt.ylabel('Feature Importance Score')
-        plt.show()
+        try:
+            feature_importances = pd.Series(self.model.feature_importances_).sort_values(ascending=False)
+            plt.figure(figsize=(12,8))
+            feature_importances.plot(kind='bar', title='Feature Importance')
+            plt.ylabel('Feature Importance Score')
+            plt.show()
+        except AttributeError:
+            print("Model has not been trained yet. Please train the model before viewing feature importance.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
 
     def evaluate_model(self, X_test, y_test):
-        predictions = self.model.predict(X_test)
-        accuracy = accuracy_score(y_test, predictions)
-        conf_matrix = confusion_matrix(y_test, predictions)
-        print(f"Accuracy: {accuracy}")
-        print(f"Confusion Matrix:\n{conf_matrix}")
+        try:
+            predictions = self.model.predict(X_test)
+            accuracy = accuracy_score(y_test, predictions)
+            conf_matrix = confusion_matrix(y_test, predictions)
+            print(f"Accuracy: {accuracy}")
+            print(f"Confusion Matrix:\n{conf_matrix}")
+        except Exception as e:
+            print(f"An error occurred during model evaluation: {e}")
 
     def save_model(self, model, file_name):
-        joblib.dump(model, os.path.join(MODEL_SAVE_PATH, file_name))
+        try:
+            joblib.dump(model, os.path.join(MODEL_SAVE_PATH, file_name))
+        except Exception as e:
+            print(f"An error occurred when saving the model: {e}")
 
     def load_model(self, file_name):
         try:
-            self.model = joblib.load(os.path.join(MODEL_SAVE_PATH, file_name))
+            self.model = jobbelab.load(os.path.join(MODEL_SAVE_PATH, file_name))
             return self.model
-        except FileNotFoundError:
-            print(f"The model file {file_name} was not found.")
+        except FileNotFoundError as e:
+            print(f"Error: {e}.\nThe model file {file_name} was not found.")
+            return None
+        except Exception as e:
+            print(f"An unexpected error occurred while loading the model: {e}")
             return None
 
     def make_prediction(self, input_data):
-        if self.model is not None:
-            prediction = self.model.predict([input_data])
-            return prediction[0]
-        else:
-            raise Exception("Model not loaded. Call load_model() before making predictions.")
+        try:
+            if self.model is not None:
+                if isinstance(input_data, (list, np.ndarray)):
+                    prediction = self.model.predict([input_data])
+                    return prediction[0]
+                else:
+                    raise ValueError("Invalid input data. Expected a list or numpy array.")
+            else:
+                raise Exception("Model not loaded. Please load a model before making predictions.")
+        except ValueError as e:
+            print(f"Error: {e}")
+            return None
+        except Exception as e:
+            print(f"An unexpected error occurred during prediction: {e}")
+            return None
 
 if __name__ == '__main__':
     dashboard_ml = SmartHomeDashboardML()
@@ -77,7 +119,7 @@ if __name__ == '__main__':
         model = dashboard_ml.train_model(X_train, y_train)
         if model:
             dashboard_ml.feature_importance()
-            dashboard_detail.evaluate_model(X_test, y_test)
+            dashboard_ml.evaluate_model(X_test, y_test)
             dashboard_ml.save_model(model, 'smart_home_model.pkl')
 
             loaded_model = dashboard_ml.load_model('smart_home_model.pkl')
