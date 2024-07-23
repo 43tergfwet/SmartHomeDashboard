@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 
 DEVICE_DATA_PATH = os.getenv('DEVICE_DATA_PATH', 'default_device_data_path.csv')
-MODEL_SAVE_PATH = os.getenv('MODEL_SAVE_PATH', '.') 
+MODEL_SAVE_PATH = os.getenv('MODEL_SAVE_PATH', '.')
 
 class SmartHomeDashboardML:
     def __init__(self):
@@ -56,24 +56,30 @@ class SmartHomeDashboardML:
     def feature_importance(self):
         try:
             feature_importances = pd.Series(self.model.feature_importances_).sort_values(ascending=False)
-            plt.figure(figsize=(12,8))
-            feature_importances.plot(kind='bar', title='Feature Importance')
-            plt.ylabel('Feature Importance Score')
-            plt.show()
+            self.plot_feature_importances(feature_importances)
         except AttributeError:
             print("Model has not been trained yet. Please train the model before viewing feature importance.")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
 
+    def plot_feature_importances(self, feature_importances):
+        plt.figure(figsize=(12,8))
+        feature_importances.plot(kind='bar', title='Feature Importance')
+        plt.ylabel('Feature Importance Score')
+        plt.show()
+
     def evaluate_model(self, X_test, y_test):
         try:
             predictions = self.model.predict(X_test)
-            accuracy = accuracy_score(y_test, predictions)
-            conf_matrix = confusion_matrix(y_test, predictions)
-            print(f"Accuracy: {accuracy}")
-            print(f"Confusion Matrix:\n{conf_matrix}")
+            self.display_model_evaluation(y_test, predictions)
         except Exception as e:
             print(f"An error occurred during model evaluation: {e}")
+
+    def display_model_evaluation(self, y_test, predictions):
+        accuracy = accuracy_score(y_test, predictions)
+        conf_matrix = confusion_matrix(y_test, predictions)
+        print(f"Accuracy: {accuracy}")
+        print(f"Confusion Matrix:\n{conf_matrix}")
 
     def save_model(self, model, file_name):
         try:
@@ -83,7 +89,7 @@ class SmartHomeDashboardML:
 
     def load_model(self, file_name):
         try:
-            self.model = jobbelab.load(os.path.join(MODEL_SAVE_PATH, file_name))
+            self.model = joblib.load(os.path.join(MODEL_SAVE_PATH, file_name))
             return self.model
         except FileNotFoundError as e:
             print(f"Error: {e}.\nThe model file {file_name} was not found.")
@@ -95,11 +101,7 @@ class SmartHomeDashboardML:
     def make_prediction(self, input_data):
         try:
             if self.model is not None:
-                if isinstance(input_data, (list, np.ndarray)):
-                    prediction = self.model.predict([input_data])
-                    return prediction[0]
-                else:
-                    raise ValueError("Invalid input data. Expected a list or numpy array.")
+                return self.process_prediction(input_data)
             else:
                 raise Exception("Model not loaded. Please load a model before making predictions.")
         except ValueError as e:
@@ -108,6 +110,13 @@ class SmartHomeDashboardML:
         except Exception as e:
             print(f"An unexpected error occurred during prediction: {e}")
             return None
+
+    def process_prediction(self, input_data):
+        if isinstance(input_data, (list, np.ndarray)):
+            prediction = self.model.predict([input_data])
+            return prediction[0]
+        else:
+            raise ValueError("Invalid input data. Expected a list or numpy array.")
 
 if __name__ == '__main__':
     dashboard_ml = SmartHomeDashboardML()
