@@ -1,91 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartHome Dashboard</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            padding: 20px;
+<div class="theme-switch-wrapper">
+    <label class="theme-switch" for="checkbox">
+        <input type="checkbox" id="checkbox" />
+        <div class="slider round"></div>
+    </label>
+    <em>Enable Dark Mode!</em>
+</div>
+```
+```css
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.container.dark-mode {
+    background-color: #1e1e1e;
+}
+
+/* Toggle Switch Styles */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 34px;
+    position: relative;
+    width: 60px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: 0.4s;
+}
+
+.slider:before {
+    background-color: #fff;
+    bottom: 4px;
+    content: "";
+    height: 26px;
+    left: 4px;
+    position: absolute;
+    transition: 0.4s;
+    width: 26px;
+}
+
+input:checked + .slider {
+    background-color: #66bb6a;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+```
+```html
+<script>
+    const toggleSwitch = document.querySelector('#checkbox');
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+      
+        if (currentTheme === 'dark') {
+            toggleSwitch.checked = true;
+            document.body.classList.add("dark-mode");
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
+    }
+
+    function switchTheme(e) {
+        if (e.target.checked) {
+            document.body.classList.add("dark-mode");
+            localStorage.setItem('theme', 'dark');
         }
-        form > div {
-            margin-bottom: 20px;
-        }
-        form input, form select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-        }
-        form button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0056b3;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        form button:hover {
-            background-color: #004199;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <section id="device-management">
-            <h2>Manage Devices</h2>
-            <form id="device-form">
-                <div>
-                    <label for="device-name">Device Name</label>
-                    <input type="text" id="device-name" name="device_name" required>
-                </div>
-                <div>
-                    <label for="device-type">Device Type</label>
-                    <select id="device-type" name="device_type" required>
-                        <option value="light">Light</option>
-                        <option value="thermostat">Thermostat</option>
-                        <option value="door-lock">Door Lock</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="device-status">Device Status</label>
-                    <select id="device-status" name="device_status" required>
-                        <option value="on">On</option>
-                        <option value="off">Off</option>
-                    </select>
-                </div>
-                <button type="submit">Update Device</button>
-            </form>
-        </section>
-        <section id="device-statuses">
-            <h2>Device Statuses</h2>
-            <div id="statuses">
-            </div>
-        </section>
-        <section id="user-auth">
-            <h2>User Registration/Login</h2>
-            <form id="register-form">
-                <div>
-                    <label for="user-name">Username</label>
-                    <input type="text" id="user-name" name="user_name" required>
-                </div>
-                <div>
-                    <label for="user-password">Password</label>
-                    <input type="password" id="user-password" name="user_password" required>
-                </div>
-                <div>
-                    <label for="user-email">Email</label>
-                    <input type="email" id="user-email" name="user_email" required>
-                </div>
-                <button type="submit">Register/Login</button>
-            </form>
-        </section>
-    </div>
-</body>
-</html>
+        else {
+            document.body.classList.remove("dark-mode");
+            localStorage.setItem('theme', 'light');
+        }    
+    }
+
+    toggleSwitch.addEventListener('change', switchTheme, false);
+</script>
