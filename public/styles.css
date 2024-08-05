@@ -1,0 +1,48 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+}
+header {
+  background-color: #007bff;
+  color: #ffffff;
+  padding: 20px;
+  text-align: center;
+}
+.main-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding: 20px;
+}
+.device-control {
+  flex-basis: 30%;
+  background-color: #ffffff;
+  margin: 10px;
+  padding: 20px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+.device-control h2 {
+  margin-top: 0;
+}
+.device-status {
+  flex-basis: 30%;
+  background-color: #ffffff;
+  margin: 10px;
+  padding: 20px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+.device-status h2 {
+  margin-top: 0;
+}
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  .device-control,
+  .device-status {
+    flex-basis: 90%;
+  }
+}
